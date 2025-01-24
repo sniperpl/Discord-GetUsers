@@ -4,9 +4,14 @@ import webbrowser
 import requests
 import json
 import time
+import os
 
 def getUsers():
-    auth = enterAuth.get()
+    auth = Authorization.get()
+    if not os.path.exists("authKey.txt"):
+        with open("authKey.txt", "w") as file:
+            file.write(auth)
+        
     if not auth:
         messagebox.showerror("ERROR", 'Enter Authorization Key')
         return
@@ -35,7 +40,7 @@ def getUsers():
 
     msgid = ''
     startTime = time.time()
-    users = 0
+    users = set()
 
     with open(filename, 'w', encoding='utf-8') as file:
         while True:
@@ -43,18 +48,18 @@ def getUsers():
             messages = json.loads(r.text)
 
             if not messages:
-                messagebox.showinfo('SUCESS', f'{filename} was generated with {users} users in {time.time() - startTime:.0f}s')
+                messagebox.showinfo('SUCESS', f'{filename} was generated with {len(users)} users in {time.time() - startTime:.0f}s')
                 break
 
             for message in messages:
-                users += 1
-                file.write(message['author']['username'] + '\n')
+                users.add(message['author']['username'])
                 msgid = '&before=' + message['id']
-
+            
+        file.writelines(user + '\n' for user in users)
 
 # Tworzenie głównego okna aplikacji
 def guiUsers(root):
-    global enterAuth, enterChannelId, enterFilename, labels
+    global Authorization, enterChannelId, enterFilename, labels
 
     root.title("Get Users")
 
@@ -62,12 +67,17 @@ def guiUsers(root):
     Frame = tk.Frame(root)
     labels.append(Frame)
 
-    label_entryAuth = tk.Label(Frame, text="Authorization Key:")
-    label_entryAuth.pack(pady=(30,0))
-    button_entryAuth = tk.Button(Frame, text="Where Can I Find Authorization Key?", command=lambda: webbrowser.open("https://www.youtube.com/watch?v=LnBnm_tZlyU"), relief="flat", bg=Frame.cget("bg"), fg="blue", font=("Arial", 8, "underline"), bd=0)
-    button_entryAuth.pack()
-    enterAuth = tk.Entry(Frame)
-    enterAuth.pack(pady=(1,0))
+    label_Authorization = tk.Label(Frame, text="Authorization Key:")
+    label_Authorization.pack(pady=(30,0))
+    button_Authorization = tk.Button(Frame, text="Where Can I Find Authorization Key?", command=lambda: webbrowser.open("https://www.youtube.com/watch?v=LnBnm_tZlyU"), relief="flat", bg=Frame.cget("bg"), fg="blue", font=("Arial", 8, "underline"), bd=0)
+    button_Authorization.pack()
+    Authorization = tk.Entry(Frame)
+    Authorization.pack(pady=(1,0))
+
+    if os.path.exists("authKey.txt"):
+        with open("authKey.txt", "r") as file:
+            authKey = file.read()
+            Authorization.insert(0, authKey)
 
     label_channelId = tk.Label(Frame, text="ChannelID:")
     label_channelId.pack(pady=(6,0))

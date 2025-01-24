@@ -24,6 +24,7 @@ def showWidgets():
     combobox.pack(pady=(5,0))
     button_back.place_forget()
     hideUsersFile()
+    root.title("App")
 
 root = tk.Tk()
 root.title("App")

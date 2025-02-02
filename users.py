@@ -8,31 +8,37 @@ import os
 
 def getUsers():
     auth = Authorization.get()
-    if not os.path.exists("authKey.txt"):
-        with open("authKey.txt", "w") as file:
-            file.write(auth)
-        
     if not auth:
-        messagebox.showerror("ERROR", 'Enter Authorization Key')
+        messagebox.showerror("ERROR", 'Enter Bot Token')
         return
     
     headers = {
-        'Authorization': auth
+        'Authorization': f'Bot {auth}'
     }
+
+    guildId = enterGuildId.get()
+    if not guildId:
+        messagebox.showerror("ERROR", 'Enter guildId')
+        return
+    
+    gid = requests.get(f'https://discord.com/api/v10/guilds/{guildId}', headers=headers)
+    if gid.status_code != 200:
+        messagebox.showerror("ERROR", "Bot must be on the server")
+        return
 
     channelId = enterChannelId.get()
     if not channelId:
-        messagebox.showerror("ERROR", 'Enter ChannelID')
+        messagebox.showerror("ERROR", 'Enter channelId')
         return
     
-    r = requests.get(f'https://discord.com/api/v10/channels/{channelId}', headers=headers)
-    if r.status_code != 200:
-        messagebox.showerror("ERROR", "This ChannelID doesn't exist")
+    cid = requests.get(f'https://discord.com/api/v10/channels/{channelId}', headers=headers)
+    if cid.status_code != 200:
+        messagebox.showerror("ERROR", "This channelId doesn't exist")
         return
     
     filename = enterFilename.get()
     if not filename:
-        messagebox.showerror("ERROR", 'Enter Filename')
+        messagebox.showerror("ERROR", 'Enter filename')
         return
 
     if '.txt' not in filename:
@@ -42,24 +48,35 @@ def getUsers():
     startTime = time.time()
     users = set()
 
+    if not os.path.exists("botKey.txt"):
+        with open("botKey.txt", "w") as file:
+            file.write(auth)
+        
+
     with open(filename, 'w', encoding='utf-8') as file:
         while True:
             r = requests.get(f'https://discord.com/api/v10/channels/{channelId}/messages?limit=100{msgid}', headers=headers)
             messages = json.loads(r.text)
 
             if not messages:
-                messagebox.showinfo('SUCESS', f'{filename} was generated with {len(users)} users in {time.time() - startTime:.0f}s')
-                break
+                for userId in users:
+                    userOnServer = requests.get(f'https://discord.com/api/v10/guilds/{guildId}/members/{userId}', headers=headers)
+                    if userOnServer.status_code == 200:
+                        user = json.loads(userOnServer.text)
+                        file.write(user['user']['username'] + '\n')
+
+                messagebox.showinfo('SUCCESS', f'{filename} was generated in {time.time() - startTime:.0f}s')
+                return
 
             for message in messages:
-                users.add(message['author']['username'])
+                users.add(message['author']['id'])
                 msgid = '&before=' + message['id']
-            
-        file.writelines(user + '\n' for user in users)
+                
+            time.sleep(.5)
 
 # Tworzenie głównego okna aplikacji
 def guiUsers(root):
-    global Authorization, enterChannelId, enterFilename, labels
+    global Authorization, enterGuildId, enterChannelId, enterFilename, labels
 
     root.title("Get Users")
 
@@ -67,24 +84,29 @@ def guiUsers(root):
     Frame = tk.Frame(root)
     labels.append(Frame)
 
-    label_Authorization = tk.Label(Frame, text="Authorization Key:")
+    label_Authorization = tk.Label(Frame, text="Authorization")
     label_Authorization.pack(pady=(30,0))
-    button_Authorization = tk.Button(Frame, text="Where Can I Find Authorization Key?", command=lambda: webbrowser.open("https://www.youtube.com/watch?v=LnBnm_tZlyU"), relief="flat", bg=Frame.cget("bg"), fg="blue", font=("Arial", 8, "underline"), bd=0)
+    button_Authorization = tk.Button(Frame, text="Where Can I Find Bot Token?", command=lambda: webbrowser.open("https://youtu.be/54d0mquJqAc"), relief="flat", bg=Frame.cget("bg"), fg="blue", font=("Arial", 8, "underline"), bd=0)
     button_Authorization.pack()
     Authorization = tk.Entry(Frame)
     Authorization.pack(pady=(1,0))
 
-    if os.path.exists("authKey.txt"):
-        with open("authKey.txt", "r") as file:
-            authKey = file.read()
-            Authorization.insert(0, authKey)
+    if os.path.exists("botKey.txt"):
+        with open("botKey.txt", "r") as file:
+            botKey = file.read()
+            Authorization.insert(0, botKey)
 
-    label_channelId = tk.Label(Frame, text="ChannelID:")
+    label_guildId = tk.Label(Frame, text="guildId")
+    label_guildId.pack(pady=(6,0))
+    enterGuildId = tk.Entry(Frame)
+    enterGuildId.pack()
+
+    label_channelId = tk.Label(Frame, text="channelId")
     label_channelId.pack(pady=(6,0))
     enterChannelId = tk.Entry(Frame)
     enterChannelId.pack()
 
-    label_filename = tk.Label(Frame, text="Filename:")
+    label_filename = tk.Label(Frame, text="filename")
     label_filename.pack(pady=(6,0))
     enterFilename = tk.Entry(Frame)
     enterFilename.pack()

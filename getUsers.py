@@ -3,11 +3,15 @@ from tkinter import ttk, messagebox
 
 from users import guiUsers, hideUsersFile
 from usersToMsgID import guiUsersMsgID, hideUsersFileMsgID
+from usersByUser import guiUsersClassic, hideUsersFileClassic
+from usersUnbanAll import guiUnbanAll, hideUnbanAll
 
 def onChoose(event):
     options = {
-        "Get Users": guiUsers,
-        "Get Users to msgid": guiUsersMsgID
+        "By you": guiUsersClassic,
+        "By bot": guiUsers,
+        "To msgid": guiUsersMsgID,
+        "UnbanAll": guiUnbanAll
     }
 
     selected_option = combobox.get()
@@ -16,7 +20,7 @@ def onChoose(event):
         options[selected_option](root)
         hideWidgets()
     else:
-        messagebox.showerror("ERROR", f"Nieobsługiwana opcja: {selected_option}")
+        messagebox.showerror("Get Users", f"Nieobsługiwana opcja: {selected_option}")
 
 def hideWidgets():
     label_option.pack_forget()
@@ -24,23 +28,27 @@ def hideWidgets():
     button_back.place(x=10, y=10)
 
 def showWidgets():
-    label_option.pack(pady=(150,0))
+    label_option.pack(pady=(200,0))
     combobox.pack(pady=(5,0))
     button_back.place_forget()
-    if combobox.get() == "Get Users":
-        hideUsersFile()
-    elif combobox.get() == "Get Users to msgid":
-        hideUsersFileMsgID()
     root.title("App")
+
+    options = {
+        "By you": hideUsersFileClassic,
+        "By bot": hideUsersFile,
+        "To msgid": hideUsersFileMsgID,
+        "UnbanAll": hideUnbanAll
+    }
+    options.get(combobox.get())()
 
 root = tk.Tk()
 root.title("App")
-root.geometry("500x350")
+root.geometry("400x450")
 
 label_option = tk.Label(root, text="Choose Option")
-label_option.pack(pady=(150,0))
+label_option.pack(pady=(200,0))
 
-options = ["Get Users", "Get Users to msgid"]
+options = ["By you", "By bot", "To msgid", "UnbanAll"]
 combobox = ttk.Combobox(root, values=options, state="readonly")
 combobox.pack(pady=(5,0))
 combobox.bind("<<ComboboxSelected>>", onChoose)

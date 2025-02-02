@@ -9,7 +9,7 @@ import os
 def getUsers():
     auth = Authorization.get()
     if not auth:
-        messagebox.showerror("ERROR", 'Enter Bot Token')
+        messagebox.showwarning("Authorization", 'Enter Bot Token')
         return
     
     headers = {
@@ -18,27 +18,30 @@ def getUsers():
 
     guildId = enterGuildId.get()
     if not guildId:
-        messagebox.showerror("ERROR", 'Enter guildId')
+        messagebox.showwarning("Get Users", 'Enter guildId')
         return
     
     gid = requests.get(f'https://discord.com/api/v10/guilds/{guildId}', headers=headers)
-    if gid.status_code != 200:
-        messagebox.showerror("ERROR", "Bot must be on the server")
+    if gid.status_code == 403:
+        messagebox.showerror("Get Users", "Missing Permissions.")
+        return
+    elif gid.status_code != 200:
+        messagebox.showerror("Get Users", "Bot must be on the server")
         return
 
     channelId = enterChannelId.get()
     if not channelId:
-        messagebox.showerror("ERROR", 'Enter channelId')
+        messagebox.showwarning("Get Users", 'Enter channelId')
         return
     
     cid = requests.get(f'https://discord.com/api/v10/channels/{channelId}', headers=headers)
     if cid.status_code != 200:
-        messagebox.showerror("ERROR", "This channelId doesn't exist")
+        messagebox.showerror("Get Users", "This channelId doesn't exist")
         return
     
     filename = enterFilename.get()
     if not filename:
-        messagebox.showerror("ERROR", 'Enter filename')
+        messagebox.showwarning("Get Users", 'Enter filename')
         return
 
     if '.txt' not in filename:
@@ -65,7 +68,7 @@ def getUsers():
                         user = json.loads(userOnServer.text)
                         file.write(user['user']['username'] + '\n')
 
-                messagebox.showinfo('SUCCESS', f'{filename} was generated in {time.time() - startTime:.0f}s')
+                messagebox.showinfo("Get Users", f'{filename} was generated in {time.time() - startTime:.0f}s')
                 return
 
             for message in messages:
@@ -78,7 +81,7 @@ def getUsers():
 def guiUsers(root):
     global Authorization, enterGuildId, enterChannelId, enterFilename, labels
 
-    root.title("Get Users")
+    root.title("Get Users by bot")
 
     labels = []
     Frame = tk.Frame(root)

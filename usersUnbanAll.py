@@ -15,6 +15,11 @@ def getUsers():
         'Authorization': f'Bot {auth}'
     }
 
+    authkey = requests.get("https://discord.com/api/v10/users/@me", headers=headers)
+    if authkey.status_code != 200:
+        messagebox.showerror("Get Users", "Wrong Authorization Key")
+        return
+
     guildId = enterGuildId.get()
     if not guildId:
         messagebox.showwarning("Unban All", 'Enter guildId')

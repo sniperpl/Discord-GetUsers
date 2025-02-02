@@ -17,6 +17,11 @@ def getUsers():
         'Authorization': auth
     }
 
+    authkey = requests.get("https://discord.com/api/v10/users/@me", headers=headers)
+    if authkey.status_code != 200:
+        messagebox.showerror("Get Users", "Wrong Authorization Key")
+        return
+
     channelId = enterChannelId.get()
     if not channelId:
         messagebox.showwarning("Get Users", 'Enter ChannelID')

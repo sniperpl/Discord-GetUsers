@@ -39,6 +39,7 @@ def getUsers():
     for unban in bans:
         userId = unban['user']['id']
         requests.delete(f"https://discord.com/api/v10/guilds/{guildId}/bans/{userId}", headers=headers)
+        time.sleep(.3)
 
     messagebox.showinfo('Unban All', f'Unbanned {len(bans)} users in {time.time() - startTime:.0f}s')
     return

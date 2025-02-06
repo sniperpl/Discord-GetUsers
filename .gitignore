@@ -170,3 +170,4 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 botKey.txt
+authKey.txt

@@ -1,4 +1,4 @@
-import tkinter as tk
+from tkinter import *
 from tkinter import ttk, messagebox
 
 from users import guiUsers, hideUsersFile
@@ -7,17 +7,20 @@ from usersByUser import guiUsersClassic, hideUsersFileClassic
 from usersUnbanAll import guiUnbanAll, hideUnbanAll
 
 def onChoose(event):
+    global userHideGui
+
     options = {
-        "By you": guiUsersClassic,
-        "By bot": guiUsers,
-        "To msgid": guiUsersMsgID,
-        "UnbanAll": guiUnbanAll
+        "By you": (guiUsersClassic, hideUsersFileClassic),
+        "By bot": (guiUsers, hideUsersFile),
+        "To msgid": (guiUsersMsgID, hideUsersFileMsgID),
+        "UnbanAll": (guiUnbanAll, hideUnbanAll)
     }
-
+    
     selected_option = combobox.get()
-
+    
     if selected_option in options:
-        options[selected_option](root)
+        userGui, userHideGui = options[selected_option]
+        userGui(root)
         hideWidgets()
     else:
         messagebox.showerror("Get Users", f"Nieobsługiwana opcja: {selected_option}")
@@ -31,28 +34,22 @@ def showWidgets():
     label_option.pack(pady=(200,0))
     combobox.pack(pady=(5,0))
     button_back.place_forget()
-    root.title("App")
+    root.title("Get Users")
 
-    options = {
-        "By you": hideUsersFileClassic,
-        "By bot": hideUsersFile,
-        "To msgid": hideUsersFileMsgID,
-        "UnbanAll": hideUnbanAll
-    }
-    options.get(combobox.get())()
+    userHideGui = globals().get('userHideGui', lambda: None)
+    userHideGui()
 
-root = tk.Tk()
-root.title("App")
+root = Tk()
 root.geometry("400x450")
 
-label_option = tk.Label(root, text="Choose Option")
-label_option.pack(pady=(200,0))
+label_option = Label(root, text="Choose Option")
 
 options = ["By you", "By bot", "To msgid", "UnbanAll"]
 combobox = ttk.Combobox(root, values=options, state="readonly")
-combobox.pack(pady=(5,0))
 combobox.bind("<<ComboboxSelected>>", onChoose)
 
-button_back = tk.Button(root, text=" ❮ ", command=showWidgets)
+button_back = Button(root, text=" ❮ ", command=showWidgets)
+
+showWidgets()
 
 root.mainloop()

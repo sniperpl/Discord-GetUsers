@@ -1,8 +1,8 @@
-import tkinter as tk
+from tkinter import *
 from tkinter import messagebox
+
 import webbrowser
 import requests
-import json
 import time
 import os
 
@@ -51,7 +51,7 @@ def getUsers():
     with open(filename, 'w', encoding='utf-8') as file:
         while True:
             r = requests.get(f'https://discord.com/api/v10/channels/{channelId}/messages?limit=100{msgid}', headers=headers)
-            messages = json.loads(r.text)
+            messages = r.json()
 
             if not messages:
                 messagebox.showinfo("Get Users", f'{filename} was generated with {len(users)} users in {time.time() - startTime:.0f}s')
@@ -70,14 +70,14 @@ def guiUsersClassic(root):
     root.title("Get Users by you")
 
     labels = []
-    Frame = tk.Frame(root)
-    labels.append(Frame)
+    containerFrame = Frame(root)
+    labels.append(containerFrame)
 
-    label_Authorization = tk.Label(Frame, text="Authorization Key:")
+    label_Authorization = Label(containerFrame, text="Authorization Key:")
     label_Authorization.pack(pady=(30,0))
-    button_Authorization = tk.Button(Frame, text="Where Can I Find Authorization Key?", command=lambda: webbrowser.open("https://www.youtube.com/watch?v=LnBnm_tZlyU"), relief="flat", bg=Frame.cget("bg"), fg="blue", font=("Arial", 8, "underline"), bd=0)
+    button_Authorization = Button(containerFrame, text="Where Can I Find Authorization Key?", command=lambda: webbrowser.open("https://www.youtube.com/watch?v=LnBnm_tZlyU"), relief="flat", bg=containerFrame.cget("bg"), fg="blue", font=("Arial", 8, "underline"), bd=0)
     button_Authorization.pack()
-    Authorization = tk.Entry(Frame)
+    Authorization = Entry(containerFrame)
     Authorization.pack(pady=(1,0))
 
     if os.path.exists("authKey.txt"):
@@ -85,20 +85,20 @@ def guiUsersClassic(root):
             authKey = file.read()
             Authorization.insert(0, authKey)
 
-    label_channelId = tk.Label(Frame, text="ChannelID:")
+    label_channelId = Label(containerFrame, text="ChannelID:")
     label_channelId.pack(pady=(6,0))
-    enterChannelId = tk.Entry(Frame)
+    enterChannelId = Entry(containerFrame)
     enterChannelId.pack()
 
-    label_filename = tk.Label(Frame, text="Filename:")
+    label_filename = Label(containerFrame, text="Filename:")
     label_filename.pack(pady=(6,0))
-    enterFilename = tk.Entry(Frame)
+    enterFilename = Entry(containerFrame)
     enterFilename.pack()
 
-    submitButton = tk.Button(Frame, text="Generate", command=getUsers)
+    submitButton = Button(containerFrame, text="Generate", command=getUsers)
     submitButton.pack(pady=(20,0))
 
-    Frame.pack()
+    containerFrame.pack()
 
 def hideUsersFileClassic():
     for label in labels:

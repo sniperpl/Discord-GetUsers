@@ -1,5 +1,6 @@
-import tkinter as tk
+from tkinter import *
 from tkinter import messagebox
+
 import webbrowser
 import requests
 import time
@@ -56,14 +57,14 @@ def guiUnbanAll(root):
     root.title("Unban All")
 
     labels = []
-    Frame = tk.Frame(root)
-    labels.append(Frame)
+    containerFrame = Frame(root)
+    labels.append(containerFrame)
 
-    label_Authorization = tk.Label(Frame, text="Authorization")
+    label_Authorization = Label(containerFrame, text="Authorization")
     label_Authorization.pack(pady=(30,0))
-    button_Authorization = tk.Button(Frame, text="Where Can I Find Bot Token?", command=lambda: webbrowser.open("https://youtu.be/54d0mquJqAc"), relief="flat", bg=Frame.cget("bg"), fg="blue", font=("Arial", 8, "underline"), bd=0)
+    button_Authorization = Button(containerFrame, text="Where Can I Find Bot Token?", command=lambda: webbrowser.open("https://youtu.be/54d0mquJqAc"), relief="flat", bg=containerFrame.cget("bg"), fg="blue", font=("Arial", 8, "underline"), bd=0)
     button_Authorization.pack()
-    Authorization = tk.Entry(Frame)
+    Authorization = Entry(containerFrame)
     Authorization.pack(pady=(1,0))
 
     if os.path.exists("botKey.txt"):
@@ -71,15 +72,15 @@ def guiUnbanAll(root):
             botKey = file.read()
             Authorization.insert(0, botKey)
 
-    label_guildId = tk.Label(Frame, text="guildId")
+    label_guildId = Label(containerFrame, text="guildId")
     label_guildId.pack(pady=(6,0))
-    enterGuildId = tk.Entry(Frame)
+    enterGuildId = Entry(containerFrame)
     enterGuildId.pack()
 
-    submitButton = tk.Button(Frame, text="Unban", command=getUsers)
+    submitButton = Button(containerFrame, text="Unban", command=getUsers)
     submitButton.pack(pady=(20,0))
 
-    Frame.pack()
+    containerFrame.pack()
 
 def hideUnbanAll():
     for label in labels:

@@ -1,7 +1,9 @@
-## Requirements
+# 🠋 IF YOU WANNA CONTRIBUTE 🠋
+
+### Requirements
 [python 3.12](https://www.python.org/downloads/release/python-3128/)
 
-## Install
+### Install
 ```sh
 pip install requests
 ```
@@ -10,7 +12,7 @@ pip install requests
 pip install cx_Freeze
 ```
 
-## Compily
+### Compily
 ```sh
 python setup.py build
 ```

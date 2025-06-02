@@ -6,10 +6,12 @@ import requests
 import time
 import os
 
+from config import UB_TITLE
+
 def getUsers():
     auth = Authorization.get()
     if not auth:
-        messagebox.showwarning("Unban All", 'Enter Bot Token')
+        messagebox.showwarning(UB_TITLE, 'Enter Bot Token')
         return
     
     headers = {
@@ -18,20 +20,20 @@ def getUsers():
 
     authkey = requests.get("https://discord.com/api/v10/users/@me", headers=headers)
     if authkey.status_code != 200:
-        messagebox.showerror("Get Users", "Wrong Authorization Key")
+        messagebox.showerror(UB_TITLE, "Wrong Authorization Key")
         return
 
     guildId = enterGuildId.get()
     if not guildId:
-        messagebox.showwarning("Unban All", 'Enter guildId')
+        messagebox.showwarning(UB_TITLE, 'Enter guildId')
         return
     
     gid = requests.get(f'https://discord.com/api/v10/guilds/{guildId}/bans', headers=headers)
     if gid.status_code == 403:
-        messagebox.showerror("Unban All", "Missing Permissions.")
+        messagebox.showerror(UB_TITLE, "Missing Permissions.")
         return
     elif gid.status_code != 200:
-        messagebox.showerror("Unban All", "Bot must be on the server")
+        messagebox.showerror(UB_TITLE, "Bot must be on the server")
         return
     else:
         bans = gid.json()
@@ -47,14 +49,14 @@ def getUsers():
         requests.delete(f"https://discord.com/api/v10/guilds/{guildId}/bans/{userId}", headers=headers)
         time.sleep(.3)
 
-    messagebox.showinfo('Unban All', f'Unbanned {len(bans)} users in {time.time() - startTime:.0f}s')
+    messagebox.showinfo(UB_TITLE, f'Unbanned {len(bans)} users in {time.time() - startTime:.0f}s')
     return
 
 # Tworzenie głównego okna aplikacji
 def guiUnbanAll(root):
     global Authorization, enterGuildId, labels
 
-    root.title("Unban All")
+    root.title(UB_TITLE)
 
     labels = []
     containerFrame = Frame(root)
@@ -72,8 +74,8 @@ def guiUnbanAll(root):
             botKey = file.read()
             Authorization.insert(0, botKey)
 
-    label_guildId = Label(containerFrame, text="guildId")
-    label_guildId.pack(pady=(6,0))
+    label_guildId = Label(containerFrame, text="GuildID")
+    label_guildId.pack(pady=(10,0))
     enterGuildId = Entry(containerFrame)
     enterGuildId.pack()
 

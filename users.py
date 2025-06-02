@@ -6,10 +6,12 @@ import requests
 import time
 import os
 
+from config import WINDOW_TITLE
+
 def getUsers():
     auth = Authorization.get()
     if not auth:
-        messagebox.showwarning("Authorization", 'Enter Bot Token')
+        messagebox.showwarning(WINDOW_TITLE, 'Enter Bot Token')
         return
     
     headers = {
@@ -18,35 +20,35 @@ def getUsers():
 
     authkey = requests.get("https://discord.com/api/v10/users/@me", headers=headers)
     if authkey.status_code != 200:
-        messagebox.showerror("Get Users", "Wrong Authorization Key")
+        messagebox.showerror(WINDOW_TITLE, "Wrong Authorization Key")
         return
 
     guildId = enterGuildId.get()
     if not guildId:
-        messagebox.showwarning("Get Users", 'Enter guildId')
+        messagebox.showwarning(WINDOW_TITLE, 'Enter guildId')
         return
     
     gid = requests.get(f'https://discord.com/api/v10/guilds/{guildId}', headers=headers)
     if gid.status_code == 403:
-        messagebox.showerror("Get Users", "Missing Permissions.")
+        messagebox.showerror(WINDOW_TITLE, "Missing Permissions.")
         return
     elif gid.status_code != 200:
-        messagebox.showerror("Get Users", "Bot must be on the server")
+        messagebox.showerror(WINDOW_TITLE, "Bot must be on the server")
         return
 
     channelId = enterChannelId.get()
     if not channelId:
-        messagebox.showwarning("Get Users", 'Enter channelId')
+        messagebox.showwarning(WINDOW_TITLE, 'Enter channelId')
         return
     
     cid = requests.get(f'https://discord.com/api/v10/channels/{channelId}', headers=headers)
     if cid.status_code != 200:
-        messagebox.showerror("Get Users", "This channelId doesn't exist")
+        messagebox.showerror(WINDOW_TITLE, "This channelId doesn't exist")
         return
     
     filename = enterFilename.get()
     if not filename:
-        messagebox.showwarning("Get Users", 'Enter filename')
+        messagebox.showwarning(WINDOW_TITLE, 'Enter filename')
         return
 
     if '.txt' not in filename:
@@ -60,7 +62,6 @@ def getUsers():
         with open("botKey.txt", "w") as file:
             file.write(auth)
         
-
     with open(filename, 'w', encoding='utf-8') as file:
         while True:
             r = requests.get(f'https://discord.com/api/v10/channels/{channelId}/messages?limit=100{msgid}', headers=headers)
@@ -73,20 +74,23 @@ def getUsers():
                         user = userOnServer.json()
                         file.write(user['user']['username'] + '\n')
 
-                messagebox.showinfo("Get Users", f'{filename} was generated in {time.time() - startTime:.0f}s')
+                messagebox.showinfo(WINDOW_TITLE, f'{filename} was generated in {time.time() - startTime:.0f}s')
                 return
 
             for message in messages:
-                users.add(message['author']['id'])
+                if cBox.get() == 1:
+                    if len(message['attachments']) > 0:
+                        users.add(message['author']['id'])
+                else:
+                    users.add(message['author']['id'])
+
                 msgid = '&before=' + message['id']
                 
             time.sleep(.5)
 
 # Tworzenie głównego okna aplikacji
 def guiUsers(root):
-    global Authorization, enterGuildId, enterChannelId, enterFilename, labels
-
-    root.title("Get Users by bot")
+    global Authorization, enterGuildId, enterChannelId, enterFilename, cBox, labels
 
     labels = []
     containerFrame = Frame(root)
@@ -104,20 +108,24 @@ def guiUsers(root):
             botKey = file.read()
             Authorization.insert(0, botKey)
 
-    label_guildId = Label(containerFrame, text="guildId")
-    label_guildId.pack(pady=(6,0))
+    label_guildId = Label(containerFrame, text="GuildID")
+    label_guildId.pack(pady=(10,0))
     enterGuildId = Entry(containerFrame)
     enterGuildId.pack()
 
-    label_channelId = Label(containerFrame, text="channelId")
-    label_channelId.pack(pady=(6,0))
+    label_channelId = Label(containerFrame, text="ChannelID")
+    label_channelId.pack(pady=(10,0))
     enterChannelId = Entry(containerFrame)
     enterChannelId.pack()
 
-    label_filename = Label(containerFrame, text="filename")
-    label_filename.pack(pady=(6,0))
+    label_filename = Label(containerFrame, text="Filename")
+    label_filename.pack(pady=(10,0))
     enterFilename = Entry(containerFrame)
     enterFilename.pack()
+
+    cBox = IntVar(value=1)
+    isOnlyImages = Checkbutton(containerFrame, text="Only With Images", variable=cBox)
+    isOnlyImages.pack(pady=(10,0))
 
     submitButton = Button(containerFrame, text="Generate", command=getUsers)
     submitButton.pack(pady=(20,0))

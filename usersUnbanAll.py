@@ -25,7 +25,7 @@ def getUsers():
 
     guildId = enterGuildId.get()
     if not guildId:
-        messagebox.showwarning(UB_TITLE, 'Enter guildId')
+        messagebox.showwarning(UB_TITLE, 'Enter GuildID')
         return
     
     gid = requests.get(f'https://discord.com/api/v10/guilds/{guildId}/bans', headers=headers)

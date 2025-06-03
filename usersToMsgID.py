@@ -11,7 +11,7 @@ from config import WINDOW_TITLE
 def getUsers():
     auth = Authorization.get()
     if not auth:
-        messagebox.showwarning(WINDOW_TITLE, 'Enter Bot Token')
+        messagebox.showwarning(WINDOW_TITLE, 'Enter Authorization Key')
         return
     
     headers = {
@@ -25,17 +25,22 @@ def getUsers():
 
     channelId = enterChannelId.get()
     if not channelId:
-        messagebox.showwarning(WINDOW_TITLE, 'Enter channelId')
+        messagebox.showwarning(WINDOW_TITLE, 'Enter ChannelID')
+        return
+    
+    cid = requests.get(f'https://discord.com/api/v10/channels/{channelId}', headers=headers)
+    if cid.status_code != 200:
+        messagebox.showerror(WINDOW_TITLE, "This ChannelID doesn't exist")
         return
     
     msgId = enterMsgId.get()
     if not msgId:
-        messagebox.showwarning(WINDOW_TITLE, 'Enter msgId')
+        messagebox.showwarning(WINDOW_TITLE, 'Enter MsgID')
         return
     
     filename = enterFilename.get()
     if not filename:
-        messagebox.showwarning(WINDOW_TITLE, 'Enter filename')
+        messagebox.showwarning(WINDOW_TITLE, 'Enter Filename')
         return
 
     if '.txt' not in filename:

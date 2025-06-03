@@ -25,7 +25,7 @@ def getUsers():
 
     guildId = enterGuildId.get()
     if not guildId:
-        messagebox.showwarning(WINDOW_TITLE, 'Enter guildId')
+        messagebox.showwarning(WINDOW_TITLE, 'Enter GuildID')
         return
     
     gid = requests.get(f'https://discord.com/api/v10/guilds/{guildId}', headers=headers)
@@ -38,17 +38,17 @@ def getUsers():
 
     channelId = enterChannelId.get()
     if not channelId:
-        messagebox.showwarning(WINDOW_TITLE, 'Enter channelId')
+        messagebox.showwarning(WINDOW_TITLE, 'Enter ChannelID')
         return
     
     cid = requests.get(f'https://discord.com/api/v10/channels/{channelId}', headers=headers)
     if cid.status_code != 200:
-        messagebox.showerror(WINDOW_TITLE, "This channelId doesn't exist")
+        messagebox.showerror(WINDOW_TITLE, "This ChannelID doesn't exist")
         return
     
     filename = enterFilename.get()
     if not filename:
-        messagebox.showwarning(WINDOW_TITLE, 'Enter filename')
+        messagebox.showwarning(WINDOW_TITLE, 'Enter Filename')
         return
 
     if '.txt' not in filename:

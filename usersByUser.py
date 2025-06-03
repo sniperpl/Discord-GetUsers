@@ -28,8 +28,8 @@ def getUsers():
         messagebox.showwarning(WINDOW_TITLE, 'Enter ChannelID')
         return
     
-    r = requests.get(f'https://discord.com/api/v10/channels/{channelId}', headers=headers)
-    if r.status_code != 200:
+    cid = requests.get(f'https://discord.com/api/v10/channels/{channelId}', headers=headers)
+    if cid.status_code != 200:
         messagebox.showerror(WINDOW_TITLE, "This ChannelID doesn't exist")
         return
     

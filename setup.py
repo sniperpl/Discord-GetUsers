@@ -2,7 +2,7 @@ from cx_Freeze import setup, Executable
 
 setup(
     name="getUsers",
-    version="1.3c",
+    version="1.5",
     description="",
-    executables=[Executable("getUsers.py", base="Win32GUI", icon="GetUsers.ico")]
+    executables=[Executable("index.py", base="Win32GUI", icon="GetUsers.ico")]
 )

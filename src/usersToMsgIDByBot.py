@@ -1,12 +1,9 @@
-from tkinter import *
+import tkinter as tk
 from tkinter import messagebox
 
-import webbrowser
-import requests
-import time
-import os
+import webbrowser, requests, time, os
 
-from config import WINDOW_TITLE
+from config import WINDOW_TITLE, defFont
 
 def getUsers():
     auth = Authorization.get()
@@ -103,47 +100,39 @@ def guiUsersMsgIDByBot(root):
     global Authorization, enterGuildId, enterChannelId, enterMsgId, enterFilename, cBox, labels
 
     labels = []
-    containerFrame = Frame(root)
+    containerFrame = tk.Frame(root)
     labels.append(containerFrame)
 
-    label_Authorization = Label(containerFrame, text="Authorization")
-    label_Authorization.pack(pady=(30,0))
-    button_Authorization = Button(containerFrame, text="Where Can I Find Bot Token?", command=lambda: webbrowser.open("https://youtu.be/54d0mquJqAc"), relief="flat", bg=containerFrame.cget("bg"), fg="blue", font=("Arial", 8, "underline"), bd=0)
-    button_Authorization.pack()
-    Authorization = Entry(containerFrame)
-    Authorization.pack(pady=(1,0))
+    tk.Label(containerFrame, text="Authorization").pack(pady=(30,0))
+    tk.Button(containerFrame, text="Where Can I Find Bot Token?", command=lambda: webbrowser.open("https://youtu.be/54d0mquJqAc"), relief="flat", bg=containerFrame.cget("bg"), fg="blue", font=(defFont, 8, "underline"), bd=0).pack()
+    Authorization = tk.Entry(containerFrame)
+    Authorization.pack(pady=(3,0), ipady=1)
 
     if os.path.exists("botKey.txt"):
         with open("botKey.txt", "r") as file:
             botKey = file.read()
             Authorization.insert(0, botKey)
 
-    label_guildId = Label(containerFrame, text="GuildID")
-    label_guildId.pack(pady=(10,0))
-    enterGuildId = Entry(containerFrame)
-    enterGuildId.pack()
+    tk.Label(containerFrame, text="GuildID").pack(pady=(10,0))
+    enterGuildId = tk.Entry(containerFrame)
+    enterGuildId.pack(ipady=1)
 
-    label_channelId = Label(containerFrame, text="ChannelID")
-    label_channelId.pack(pady=(10,0))
-    enterChannelId = Entry(containerFrame)
-    enterChannelId.pack()
+    tk.Label(containerFrame, text="ChannelID").pack(pady=(10,0))
+    enterChannelId = tk.Entry(containerFrame)
+    enterChannelId.pack(ipady=1)
 
-    label_msgId = Label(containerFrame, text="MessageID")
-    label_msgId.pack(pady=(10,0))
-    enterMsgId = Entry(containerFrame)
-    enterMsgId.pack()
+    tk.Label(containerFrame, text="MessageID").pack(pady=(10,0))
+    enterMsgId = tk.Entry(containerFrame)
+    enterMsgId.pack(ipady=1)
 
-    label_filename = Label(containerFrame, text="Filename")
-    label_filename.pack(pady=(10,0))
-    enterFilename = Entry(containerFrame)
-    enterFilename.pack()
+    tk.Label(containerFrame, text="Filename").pack(pady=(10,0))
+    enterFilename = tk.Entry(containerFrame)
+    enterFilename.pack(ipady=1)
 
-    cBox = IntVar(value=1)
-    isOnlyImages = Checkbutton(containerFrame, text="Only With Images", variable=cBox)
-    isOnlyImages.pack(pady=(10,0))
+    cBox = tk.IntVar(value=1)
+    tk.Checkbutton(containerFrame, text="Only With Images", variable=cBox, font=(defFont, 10)).pack(pady=(10,0))
 
-    submitButton = Button(containerFrame, text="Generate", command=getUsers)
-    submitButton.pack(pady=(20,0))
+    tk.Button(containerFrame, text="Generate", command=getUsers, font=(defFont, 12, "bold")).pack(pady=(20,0))
 
     containerFrame.pack()
 

@@ -3,7 +3,7 @@ from tkinter import messagebox
 
 import webbrowser, requests, time, os
 
-from config import WINDOW_TITLE, defFont
+from config import WINDOW_TITLE, defFont, center_window, root
 
 def getUsers():
     auth = Authorization.get()
@@ -46,7 +46,7 @@ def getUsers():
     filename = enterFilename.get()
     if not filename:
         messagebox.showwarning(WINDOW_TITLE, 'Enter Filename')
-        return
+        return\
 
     if '.txt' not in filename:
         filename += '.txt'
@@ -71,6 +71,7 @@ def getUsers():
                         user = userOnServer.json()
                         file.write(user['user']['username'] + '\n')
 
+                msg.destroy()
                 messagebox.showinfo(WINDOW_TITLE, f'{filename} was generated in {time.time() - startTime:.0f}s')
                 return
 
@@ -83,7 +84,18 @@ def getUsers():
 
                 msgid = '&before=' + message['id']
                 
-            time.sleep(.5)
+            time.sleep(.3)
+
+def genStart():
+    global msg
+    
+    msg = tk.Toplevel(root)
+    msg.title(WINDOW_TITLE)
+    center_window(msg, 245, 70)
+
+    tk.Message(msg, text="Don't close the app until it finishes collecting users", padx=20, pady=20, width=225, font=(defFont, 10)).pack()
+
+    root.after(100, getUsers)
 
 # Tworzenie głównego okna aplikacji
 def guiUsers(root):
@@ -118,7 +130,7 @@ def guiUsers(root):
     cBox = tk.IntVar(value=1)
     tk.Checkbutton(containerFrame, text="Only With Images", variable=cBox, font=(defFont, 10)).pack(pady=(10,0))
 
-    tk.Button(containerFrame, text="Generate", command=getUsers, font=(defFont, 12, "bold")).pack(pady=(20,0))
+    tk.Button(containerFrame, text="Generate", command=genStart, font=(defFont, 12, "bold")).pack(pady=(20,0))
 
     containerFrame.pack()
 

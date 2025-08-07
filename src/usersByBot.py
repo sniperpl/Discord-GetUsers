@@ -46,7 +46,7 @@ def getUsers():
     filename = enterFilename.get()
     if not filename:
         messagebox.showwarning(WINDOW_TITLE, 'Enter Filename')
-        return\
+        return
 
     if '.txt' not in filename:
         filename += '.txt'
@@ -71,7 +71,7 @@ def getUsers():
                         user = userOnServer.json()
                         file.write(user['user']['username'] + '\n')
 
-                msg.destroy()
+                genMsg.destroy()
                 messagebox.showinfo(WINDOW_TITLE, f'{filename} was generated in {time.time() - startTime:.0f}s')
                 return
 
@@ -87,13 +87,13 @@ def getUsers():
             time.sleep(.3)
 
 def genStart():
-    global msg
+    global genMsg
     
-    msg = tk.Toplevel(root)
-    msg.title(WINDOW_TITLE)
-    center_window(msg, 245, 70)
+    genMsg = tk.Toplevel(root)
+    genMsg.title(WINDOW_TITLE)
+    center_window(genMsg, 245, 70)
 
-    tk.Message(msg, text="Don't close the app until it finishes collecting users", padx=20, pady=20, width=225, font=(defFont, 10)).pack()
+    tk.Message(genMsg, text="Don't close the app until it finishes collecting users", padx=20, pady=20, width=225, font=(defFont, 10)).pack()
 
     root.after(100, getUsers)
 

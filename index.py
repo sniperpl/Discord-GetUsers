@@ -37,7 +37,7 @@ def hideWidgets():
         setTitle(combobox.get())
 
 def showWidgets():
-    label_option.pack(pady=(200,0))
+    label_option.pack(pady=(225,0))
     combobox.pack(pady=(5,0))
     button_back.place_forget()
     setTitle()

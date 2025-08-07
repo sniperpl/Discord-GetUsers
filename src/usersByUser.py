@@ -3,7 +3,7 @@ from tkinter import messagebox
 
 import webbrowser, requests, time, os
 
-from config import WINDOW_TITLE, defFont
+from config import WINDOW_TITLE, defFont, center_window, root
 
 def getUsers():
     auth = Authorization.get()
@@ -34,6 +34,11 @@ def getUsers():
     if not filename:
         messagebox.showwarning(WINDOW_TITLE, 'Enter Filename')
         return
+    
+    cMsg = enterMessage.get()
+    if boxText.get() == 1 and not cMsg:
+        messagebox.showwarning(WINDOW_TITLE, 'Enter Message')
+        return
 
     if '.txt' not in filename:
         filename += '.txt'
@@ -52,23 +57,49 @@ def getUsers():
             messages = r.json()
 
             if not messages:
+                if len(users) < 1:
+                    genMsg.destroy()
+                    file.close()
+                    os.remove(filename)
+
+                    messagebox.showinfo(WINDOW_TITLE, f'No users found')
+                    return
+                ######
+                file.writelines(user + '\n' for user in users)
+                genMsg.destroy()
+                
                 messagebox.showinfo(WINDOW_TITLE, f'{filename} was generated with {len(users)} users in {time.time() - startTime:.0f}s')
-                break
+                return
 
             for message in messages:
-                if cBox.get() == 1:
+                if boxImage.get() == 1 and boxText.get() == 1:
+                    if len(message['attachments']) > 0 and cMsg in message['content']:
+                        users.add(message['author']['username'])
+                elif boxImage.get() == 1:
                     if len(message['attachments']) > 0:
+                        users.add(message['author']['username'])
+                elif boxText.get() == 1:
+                    if cMsg.lower() in message['content'].lower():
                         users.add(message['author']['username'])
                 else:
                     users.add(message['author']['username'])
 
                 msgid = '&before=' + message['id']
-            
-        file.writelines(user + '\n' for user in users)
+                
+def genStart():
+    global genMsg
+    
+    genMsg = tk.Toplevel(root)
+    genMsg.title(WINDOW_TITLE)
+    center_window(genMsg, 245, 70)
+
+    tk.Message(genMsg, text="Don't close the app until it finishes collecting users", padx=20, pady=20, width=225, font=(defFont, 10)).pack()
+
+    root.after(100, getUsers)
 
 # Tworzenie głównego okna aplikacji
 def guiUsersClassic(root):
-    global Authorization, enterChannelId, enterFilename, cBox, labels
+    global Authorization, enterChannelId, enterFilename, enterMessage, boxImage, boxText, btn, labels
 
     labels = []
     containerFrame = tk.Frame(root)
@@ -92,12 +123,28 @@ def guiUsersClassic(root):
     enterFilename = tk.Entry(containerFrame)
     enterFilename.pack(ipady=1)
 
-    cBox = tk.IntVar(value=1)
-    tk.Checkbutton(containerFrame, text="Only With Images", variable=cBox, font=(defFont, 10)).pack(pady=(10,0))
+    boxImage = tk.IntVar(value=1)
+    tk.Checkbutton(containerFrame, text="Only With Images", variable=boxImage, font=(defFont, 10)).pack(pady=(10,0))
 
-    tk.Button(containerFrame, text="Generate", command=getUsers, font=(defFont, 12, "bold")).pack(pady=(20,0))
+    boxText = tk.IntVar()
+    tk.Checkbutton(containerFrame, text="Check Message", variable=boxText, command=vMessage, font=(defFont, 10)).pack()
+
+    entryMsg = tk.Frame(containerFrame)
+    entryMsg.pack()
+    enterMessage = tk.Entry(entryMsg)
+    
+    btn = tk.Button(containerFrame, text="Generate", command=genStart, font=(defFont, 12, "bold"))
+    btn.pack(pady=(20,0))
 
     containerFrame.pack()
+
+def vMessage():
+    if boxText.get() == 1:
+        btn.pack_configure(pady=(20,0))
+        enterMessage.pack(ipady=1)
+    else:
+        btn.pack_configure(pady=0)
+        enterMessage.pack_forget()
 
 def hideUsersFileClassic():
     for label in labels:

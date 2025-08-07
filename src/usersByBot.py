@@ -47,6 +47,11 @@ def getUsers():
     if not filename:
         messagebox.showwarning(WINDOW_TITLE, 'Enter Filename')
         return
+    
+    cMsg = enterMessage.get()
+    if boxText.get() == 1 and not cMsg:
+        messagebox.showwarning(WINDOW_TITLE, 'Enter Message')
+        return
 
     if '.txt' not in filename:
         filename += '.txt'
@@ -65,6 +70,14 @@ def getUsers():
             messages = r.json()
 
             if not messages:
+                if len(users) < 1:
+                    genMsg.destroy()
+                    file.close()
+                    os.remove(filename)
+
+                    messagebox.showinfo(WINDOW_TITLE, f'No users found')
+                    return
+                ######
                 for userId in users:
                     userOnServer = requests.get(f'https://discord.com/api/v10/guilds/{guildId}/members/{userId}', headers=headers)
                     if userOnServer.status_code == 200:
@@ -76,8 +89,14 @@ def getUsers():
                 return
 
             for message in messages:
-                if cBox.get() == 1:
+                if boxImage.get() == 1 and boxText.get() == 1:
+                    if len(message['attachments']) > 0 and cMsg in message['content']:
+                        users.add(message['author']['id'])
+                elif boxImage.get() == 1:
                     if len(message['attachments']) > 0:
+                        users.add(message['author']['id'])
+                elif boxText.get() == 1:
+                    if cMsg.lower() in message['content'].lower():
                         users.add(message['author']['id'])
                 else:
                     users.add(message['author']['id'])
@@ -99,7 +118,7 @@ def genStart():
 
 # Tworzenie głównego okna aplikacji
 def guiUsers(root):
-    global Authorization, enterGuildId, enterChannelId, enterFilename, cBox, labels
+    global Authorization, enterGuildId, enterChannelId, enterFilename, enterMessage, boxImage, boxText, btn, labels
 
     labels = []
     containerFrame = tk.Frame(root)
@@ -127,12 +146,28 @@ def guiUsers(root):
     enterFilename = tk.Entry(containerFrame)
     enterFilename.pack(ipady=1)
 
-    cBox = tk.IntVar(value=1)
-    tk.Checkbutton(containerFrame, text="Only With Images", variable=cBox, font=(defFont, 10)).pack(pady=(10,0))
+    boxImage = tk.IntVar(value=1)
+    tk.Checkbutton(containerFrame, text="Only With Images", variable=boxImage, font=(defFont, 10)).pack(pady=(10,0))
 
-    tk.Button(containerFrame, text="Generate", command=genStart, font=(defFont, 12, "bold")).pack(pady=(20,0))
+    boxText = tk.IntVar()
+    tk.Checkbutton(containerFrame, text="Check Message", variable=boxText, command=vMessage, font=(defFont, 10)).pack()
+
+    entryMsg = tk.Frame(containerFrame)
+    entryMsg.pack()
+    enterMessage = tk.Entry(entryMsg)
+
+    btn = tk.Button(containerFrame, text="Generate", command=genStart, font=(defFont, 12, "bold"))
+    btn.pack(pady=(20,0))
 
     containerFrame.pack()
+
+def vMessage():
+    if boxText.get() == 1:
+        btn.pack_configure(pady=(20,0))
+        enterMessage.pack(ipady=1)
+    else:
+        btn.pack_configure(pady=0)
+        enterMessage.pack_forget()
 
 def hideUsersFile():
     for label in labels:

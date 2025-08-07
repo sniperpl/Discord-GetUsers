@@ -12,7 +12,7 @@ def center_window(window, width, height):
     window.geometry(f"{width}x{height}+{x}+{y}")
 
 root = Tk()
-center_window(root, 400, 450)
+center_window(root, 400, 500)
 
 root.option_add("*Label.Font", (defFont, 13))
 root.option_add("*Entry.Width", 25)

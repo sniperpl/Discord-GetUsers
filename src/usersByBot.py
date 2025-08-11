@@ -5,7 +5,9 @@ import webbrowser, requests, time, os
 
 from config import WINDOW_TITLE, defFont, center_window, root
 
-def getUsers():
+def checkAuth():
+    global headers, guildId, channelId, filename, cMsg, imgAmount
+
     auth = Authorization.get()
     if not auth:
         messagebox.showwarning(WINDOW_TITLE, 'Enter Bot Token')
@@ -48,6 +50,11 @@ def getUsers():
         messagebox.showwarning(WINDOW_TITLE, 'Enter Filename')
         return
     
+    imgAmount = int(enterImgAmount.get() or 0)
+    if boxImage.get() == 1 and imgAmount <= 0:
+        messagebox.showwarning(WINDOW_TITLE, 'Enter Amount of Images')
+        return
+    
     cMsg = enterMessage.get()
     if boxText.get() == 1 and not cMsg:
         messagebox.showwarning(WINDOW_TITLE, 'Enter Message')
@@ -56,14 +63,17 @@ def getUsers():
     if '.txt' not in filename:
         filename += '.txt'
 
+    if not os.path.exists("botKey.txt"):
+        with open("botKey.txt", "w") as file:
+            file.write(auth)
+
+    return True
+
+def getUsers():
     msgid = ''
     startTime = time.time()
     users = set()
 
-    if not os.path.exists("botKey.txt"):
-        with open("botKey.txt", "w") as file:
-            file.write(auth)
-        
     with open(filename, 'w', encoding='utf-8') as file:
         while True:
             r = requests.get(f'https://discord.com/api/v10/channels/{channelId}/messages?limit=100{msgid}', headers=headers)
@@ -90,10 +100,10 @@ def getUsers():
 
             for message in messages:
                 if boxImage.get() == 1 and boxText.get() == 1:
-                    if len(message['attachments']) > 0 and cMsg in message['content']:
+                    if len(message['attachments']) >= imgAmount and cMsg in message['content']:
                         users.add(message['author']['id'])
                 elif boxImage.get() == 1:
-                    if len(message['attachments']) > 0:
+                    if len(message['attachments']) >= imgAmount:
                         users.add(message['author']['id'])
                 elif boxText.get() == 1:
                     if cMsg.lower() in message['content'].lower():
@@ -106,19 +116,20 @@ def getUsers():
             time.sleep(.3)
 
 def genStart():
-    global genMsg
-    
-    genMsg = tk.Toplevel(root)
-    genMsg.title(WINDOW_TITLE)
-    center_window(genMsg, 245, 70)
+    if checkAuth():
+        global genMsg
+        
+        genMsg = tk.Toplevel(root)
+        genMsg.title(WINDOW_TITLE)
+        center_window(genMsg, 245, 70)
 
-    tk.Message(genMsg, text="Don't close the app until it finishes collecting users", padx=20, pady=20, width=225, font=(defFont, 10)).pack()
+        tk.Message(genMsg, text="Don't close the app until it finishes collecting users", padx=20, pady=20, width=225, font=(defFont, 10)).pack()
 
-    root.after(100, getUsers)
+        root.after(100, getUsers)
 
 # Tworzenie głównego okna aplikacji
 def guiUsers(root):
-    global Authorization, enterGuildId, enterChannelId, enterFilename, enterMessage, boxImage, boxText, btn, labels
+    global Authorization, enterGuildId, enterChannelId, enterFilename, entryImgAmount, enterImgAmount, entryMsg, enterMessage, boxImage, boxText, labels
 
     labels = []
     containerFrame = tk.Frame(root)
@@ -146,8 +157,12 @@ def guiUsers(root):
     enterFilename = tk.Entry(containerFrame)
     enterFilename.pack(ipady=1)
 
-    boxImage = tk.IntVar(value=1)
-    tk.Checkbutton(containerFrame, text="Only With Images", variable=boxImage, font=(defFont, 10)).pack(pady=(10,0))
+    boxImage = tk.IntVar()
+    tk.Checkbutton(containerFrame, text="Check Images", variable=boxImage, command=vImage, font=(defFont, 10)).pack(pady=(10,0))
+
+    entryImgAmount = tk.Frame(containerFrame)
+    entryImgAmount.pack()
+    enterImgAmount = tk.Entry(entryImgAmount, textvariable=tk.StringVar(value="1"))
 
     boxText = tk.IntVar()
     tk.Checkbutton(containerFrame, text="Check Message", variable=boxText, command=vMessage, font=(defFont, 10)).pack()
@@ -156,18 +171,23 @@ def guiUsers(root):
     entryMsg.pack()
     enterMessage = tk.Entry(entryMsg)
 
-    btn = tk.Button(containerFrame, text="Generate", command=genStart, font=(defFont, 12, "bold"))
-    btn.pack(pady=(20,0))
+    tk.Button(containerFrame, text="Generate", command=genStart, font=(defFont, 12, "bold")).pack(pady=(15,0))
 
     containerFrame.pack()
 
 def vMessage():
     if boxText.get() == 1:
-        btn.pack_configure(pady=(20,0))
         enterMessage.pack(ipady=1)
     else:
-        btn.pack_configure(pady=0)
+        entryMsg.configure(height=1)
         enterMessage.pack_forget()
+
+def vImage():
+    if boxImage.get() == 1:
+        enterImgAmount.pack(ipady=1)
+    else:
+        entryImgAmount.configure(height=1)
+        enterImgAmount.pack_forget()
 
 def hideUsersFile():
     for label in labels:

@@ -3,29 +3,29 @@ from tkinter import messagebox
 
 import webbrowser, requests, time, os
 
-from config import UB_TITLE, center_window, root, defFont
+from config import root, verApi, defFont, UB_TITLE, center_window
 
 def getUsers():
     auth = Authorization.get()
     if not auth:
-        messagebox.showwarning(UB_TITLE, 'Enter Bot Token')
+        messagebox.showwarning(UB_TITLE, "Enter Bot Token")
         return
     
     headers = {
-        'Authorization': f'Bot {auth}'
+        "Authorization": f"Bot {auth}"
     }
 
-    authkey = requests.get("https://discord.com/api/v10/users/@me", headers=headers)
+    authkey = requests.get(f"https://discord.com/{verApi}/v10/users/@me", headers=headers)
     if authkey.status_code != 200:
         messagebox.showerror(UB_TITLE, "Wrong Authorization Key")
         return
 
     guildId = enterGuildId.get()
     if not guildId:
-        messagebox.showwarning(UB_TITLE, 'Enter GuildID')
+        messagebox.showwarning(UB_TITLE, "Enter GuildID")
         return
     
-    gid = requests.get(f'https://discord.com/api/v10/guilds/{guildId}/bans', headers=headers)
+    gid = requests.get(f"https://discord.com/{verApi}/v10/guilds/{guildId}/bans", headers=headers)
     if gid.status_code == 403:
         messagebox.showerror(UB_TITLE, "Missing Permissions.")
         return
@@ -35,36 +35,31 @@ def getUsers():
     else:
         banList = gid.json()
         if len(banList) < 1:
-            msg = tk.Toplevel(root)
-            msg.title(UB_TITLE)
-            center_window(msg, 245, 70)
-
-            tk.Message(msg, text="There is no one to unban", padx=20, pady=20, width=225, font=(defFont, 15)).pack()
-            msg.after(3000, msg.destroy)
+            messagebox.showwarning(UB_TITLE, "There is no one to unban")
             return
 
         ubAsk = messagebox.askyesno(UB_TITLE, f"Do you wanna unban {len(banList)} users?")
         if not ubAsk:
             return
         else:
-                msg = tk.Toplevel(root)
-                msg.title(UB_TITLE)
-                center_window(msg, 245, 70)
+            msg = tk.Toplevel(root)
+            msg.title(UB_TITLE)
+            center_window(msg, 245, 70)
 
-                tk.Message(msg, text=f"Starting unbanning {len(banList)} users, please be patient!", padx=20, pady=20, width=225, font=(defFont, 10)).pack()
+            tk.Message(msg, text=f"Unbanning {len(banList)} users, please be patient!", padx=20, pady=20, width=225, font=(defFont, 10)).pack()
 
-                if not os.path.exists("botKey.txt"):
-                    with open("botKey.txt", "w") as file:
-                        file.write(auth)
+            if not os.path.exists("botKey.txt"):
+                with open("botKey.txt", "w") as file:
+                    file.write(auth)
 
-                for unban in banList:
-                    userId = unban['user']['id']
-                    requests.delete(f"https://discord.com/api/v10/guilds/{guildId}/bans/{userId}", headers=headers)
-                    time.sleep(.3)
+            for unban in banList:
+                userId = unban["user"]["id"]
+                requests.delete(f"https://discord.com/api/{verApi}/guilds/{guildId}/bans/{userId}", headers=headers)
+                time.sleep(.3)
 
-                msg.destroy()
-                messagebox.showinfo(UB_TITLE, f'Unbanned {len(banList)} users')
-                return
+            msg.destroy()
+            messagebox.showinfo(UB_TITLE, f"Unbanned {len(banList)} users")
+            return
 
 # Tworzenie głównego okna aplikacji
 def guiUnbanAll(root):

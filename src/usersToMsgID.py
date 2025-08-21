@@ -3,57 +3,57 @@ from tkinter import messagebox
 
 import webbrowser, requests, time, os
 
-from config import WINDOW_TITLE, defFont, center_window, root
+from config import root, verApi, defFont, WINDOW_TITLE, center_window 
 
 def checkAuth():
     global headers, channelId, msgId, filename, cMsg, imgAmount
 
     auth = Authorization.get()
     if not auth:
-        messagebox.showwarning(WINDOW_TITLE, 'Enter Authorization Key')
+        messagebox.showwarning(WINDOW_TITLE, "Enter Authorization Key")
         return
     
     headers = {
-        'Authorization': auth
+        "Authorization": auth
     }
 
-    authkey = requests.get("https://discord.com/api/v10/users/@me", headers=headers)
+    authkey = requests.get(f"https://discord.com/api/{verApi}/users/@me", headers=headers)
     if authkey.status_code != 200:
         messagebox.showerror(WINDOW_TITLE, "Wrong Authorization Key")
         return
 
     channelId = enterChannelId.get()
     if not channelId:
-        messagebox.showwarning(WINDOW_TITLE, 'Enter ChannelID')
+        messagebox.showwarning(WINDOW_TITLE, "Enter ChannelID")
         return
     
-    cid = requests.get(f'https://discord.com/api/v10/channels/{channelId}', headers=headers)
+    cid = requests.get(f"https://discord.com/api/{verApi}/channels/{channelId}", headers=headers)
     if cid.status_code != 200:
         messagebox.showerror(WINDOW_TITLE, "This ChannelID doesn't exist")
         return
     
     msgId = enterMsgId.get()
     if not msgId:
-        messagebox.showwarning(WINDOW_TITLE, 'Enter MsgID')
+        messagebox.showwarning(WINDOW_TITLE, "Enter MsgID")
         return
     
     filename = enterFilename.get()
     if not filename:
-        messagebox.showwarning(WINDOW_TITLE, 'Enter Filename')
+        messagebox.showwarning(WINDOW_TITLE, "Enter Filename")
         return
     
     imgAmount = int(enterImgAmount.get() or 0)
     if boxImage.get() == 1 and imgAmount <= 0:
-        messagebox.showwarning(WINDOW_TITLE, 'Enter Amount of Images')
+        messagebox.showwarning(WINDOW_TITLE, "Enter Amount of Images")
         return
     
     cMsg = enterMessage.get()
     if boxText.get() == 1 and not cMsg:
-        messagebox.showwarning(WINDOW_TITLE, 'Enter Message')
+        messagebox.showwarning(WINDOW_TITLE, "Enter Message")
         return
 
-    if '.txt' not in filename:
-        filename += '.txt'
+    if ".txt" not in filename:
+        filename += ".txt"
 
     if not os.path.exists("authKey.txt"):
         with open("authKey.txt", "w") as file:
@@ -62,44 +62,44 @@ def checkAuth():
     return True
 
 def getUsers():
-    msgid = ''
+    msgid = ""
     startTime = time.time()
     users = set()
 
-    with open(filename, 'w', encoding='utf-8') as file:
+    with open(filename, "w", encoding="utf-8") as file:
         while True:
-            r = requests.get(f'https://discord.com/api/v10/channels/{channelId}/messages?limit=100{msgid}', headers=headers)
+            r = requests.get(f"https://discord.com/api/{verApi}/channels/{channelId}/messages?limit=100{msgid}", headers=headers)
             messages = r.json()
 
             for message in messages:
                 if boxImage.get() == 1 and boxText.get() == 1:
-                    if len(message['attachments']) >= imgAmount and cMsg in message['content']:
-                        users.add(message['author']['username'])
+                    if len(message["attachments"]) >= imgAmount and cMsg.lower().strip() in message["content"].lower():
+                        users.add(message["author"]["username"])
                 elif boxImage.get() == 1:
-                    if len(message['attachments']) >= imgAmount:
-                        users.add(message['author']['username'])
+                    if len(message["attachments"]) >= imgAmount:
+                        users.add(message["author"]["username"])
                 elif boxText.get() == 1:
-                    if cMsg.lower() in message['content'].lower():
-                        users.add(message['author']['username'])
+                    if cMsg.lower().strip() in message["content"].lower():
+                        users.add(message["author"]["username"])
                 else:
-                    users.add(message['author']['username'])
+                    users.add(message["author"]["username"])
 
-                if message['id'] == msgId:
+                if message["id"] == msgId:
                     if len(users) < 1:
                         genMsg.destroy()
                         file.close()
                         os.remove(filename)
 
-                        messagebox.showinfo(WINDOW_TITLE, f'No users found')
+                        messagebox.showinfo(WINDOW_TITLE, f"No users found")
                         return
                     ######
-                    file.writelines(user + '\n' for user in users)
+                    file.writelines(user + "\n" for user in users)
                     genMsg.destroy()
 
-                    messagebox.showinfo(WINDOW_TITLE, f'{filename} was generated with {len(users)} users in {time.time() - startTime:.0f}s')
+                    messagebox.showinfo(WINDOW_TITLE, f"{filename} was generated with {len(users)} users in {time.time() - startTime:.0f}s")
                     return
 
-                msgid = '&before=' + message['id']
+                msgid = "&before=" + message["id"]
 
 def genStart():
     if checkAuth():
@@ -115,7 +115,7 @@ def genStart():
 
 # Tworzenie głównego okna aplikacji
 def guiUsersMsgID(root):
-    global Authorization, enterChannelId, enterMsgId, enterFilename, entryMsg, enterMessage, entryImgAmount, enterImgAmount, boxImage, boxText, labels
+    global Authorization, enterChannelId, enterMsgId, enterFilename, entryMessage, enterMessage, entryImgAmount, enterImgAmount, boxImage, boxText, labels
 
     labels = []
     containerFrame = tk.Frame(root)
@@ -153,9 +153,9 @@ def guiUsersMsgID(root):
     boxText = tk.IntVar()
     tk.Checkbutton(containerFrame, text="Check Message", variable=boxText, command=vMessage, font=(defFont, 10)).pack()
 
-    entryMsg = tk.Frame(containerFrame)
-    entryMsg.pack()
-    enterMessage = tk.Entry(entryMsg)
+    entryMessage = tk.Frame(containerFrame)
+    entryMessage.pack()
+    enterMessage = tk.Entry(entryMessage)
 
     tk.Button(containerFrame, text="Generate", command=genStart, font=(defFont, 12, "bold")).pack(pady=(15,0))
 
@@ -165,7 +165,7 @@ def vMessage():
     if boxText.get() == 1:
         enterMessage.pack(ipady=1)
     else:
-        entryMsg.configure(height=1)
+        entryMessage.configure(height=1)
         enterMessage.pack_forget()
 
 def vImage():

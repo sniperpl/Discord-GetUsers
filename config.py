@@ -1,6 +1,9 @@
 from tkinter import Tk
 
+verApi = "v10"
 defFont = "Bahnschrift Light"
+WINDOW_TITLE = "Get Users"
+UB_TITLE = "Unban All"
 
 def center_window(window, width, height):
     screen_width = window.winfo_screenwidth()
@@ -17,9 +20,6 @@ center_window(root, 400, 500)
 root.iconbitmap("favicon.ico")
 root.option_add("*Label.Font", (defFont, 13))
 root.option_add("*Entry.Width", 25)
-
-WINDOW_TITLE = "Get Users"
-UB_TITLE = "Unban All"
 
 def setTitle(suffix=""):
     root.title(f"{WINDOW_TITLE}{f' {suffix}' if suffix else ''}")

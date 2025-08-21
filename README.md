@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/sniperpl/Discord-GetUsers/releases/download/v1.6b/GetUsers.rar">
+  <a href="https://github.com/sniperpl/Discord-GetUsers/releases/latest/download/GetUsers.rar">
     <img src="https://img.shields.io/badge/Download-000?style=for-the-badge" style="height: 75px" />
   </a>
 </p>

@@ -16,7 +16,10 @@ def getUsers():
     }
 
     authkey = requests.get(f"https://discord.com/{verApi}/v10/users/@me", headers=headers)
-    if authkey.status_code != 200:
+    if authkey.status_code in (500, 502):
+        messagebox.showwarning(UB_TITLE, "Problem with Discord API")
+        return
+    elif authkey.status_code != 200:
         messagebox.showerror(UB_TITLE, "Wrong Authorization Key")
         return
 

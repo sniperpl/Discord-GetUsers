@@ -5,6 +5,7 @@ from src.usersByUser import guiUsersClassic, hideUsersFileClassic
 from src.usersToMsgID import guiUsersMsgID, hideUsersFileMsgID
 from src.usersToMsgIDByBot import guiUsersMsgIDByBot, hideUsersFileMsgIDByBot
 from src.usersUnbanAll import guiUnbanAll, hideUnbanAll
+from src.usersWithRole import guiUsersRole, hideUsersRole
 
 from config import setTitle, WINDOW_TITLE, root
 
@@ -16,6 +17,7 @@ def onChoose(event):
         "By Bot": (guiUsers, hideUsersFile),
         "To MsgID": (guiUsersMsgID, hideUsersFileMsgID),
         "To MsgID By Bot": (guiUsersMsgIDByBot, hideUsersFileMsgIDByBot),
+        "With Role": (guiUsersRole, hideUsersRole),
         "Unban All": (guiUnbanAll, hideUnbanAll)
     }
     
@@ -39,6 +41,7 @@ def hideWidgets():
 def showWidgets():
     label_option.pack(pady=(225,0))
     combobox.pack(pady=(5,0))
+    combobox.set('')
     button_back.place_forget()
     setTitle()
 
@@ -46,7 +49,7 @@ def showWidgets():
 
 label_option = Label(root, text="Choose Option")
 
-options = ["By User", "By Bot", "To MsgID", "To MsgID By Bot", "Unban All"]
+options = ["By User", "By Bot", "To MsgID", "To MsgID By Bot", "With Role", "Unban All"]
 combobox = ttk.Combobox(root, values=options, state="readonly")
 combobox.bind("<<ComboboxSelected>>", onChoose)
 

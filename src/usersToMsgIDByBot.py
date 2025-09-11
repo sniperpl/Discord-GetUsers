@@ -18,7 +18,10 @@ def checkAuth():
     }
 
     authkey = requests.get(f"https://discord.com/api/{verApi}/users/@me", headers=headers)
-    if authkey.status_code != 200:
+    if authkey.status_code in (500, 502):
+        messagebox.showwarning(WINDOW_TITLE, "Problem with Discord API")
+        return
+    elif authkey.status_code != 200:
         messagebox.showerror(WINDOW_TITLE, "Wrong Authorization Key")
         return
 

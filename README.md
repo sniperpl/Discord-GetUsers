@@ -11,6 +11,7 @@
   - by Bot `Checks if the user is on the server, but checks longer than user`
   - to Message ID `Better solution than by bot, but no check is the user on the server`
   - to Message ID by Bot `Checks if the user is on the server, but checks longer than user`
+  - with Role ID
 - Unban All
 
 ## 🠋 IF YOU WANNA CONTRIBUTE 🠋

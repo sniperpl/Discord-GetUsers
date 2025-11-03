@@ -32,7 +32,7 @@ def checkAuth():
     
     gid = requests.get(f"https://discord.com/api/{verApi}/guilds/{guildId}", headers=headers)
     if gid.status_code == 403:
-        messagebox.showerror(WINDOW_TITLE, "Missing Permissions.")
+        messagebox.showerror(WINDOW_TITLE, "Missing Permissions")
         return
     elif gid.status_code != 200:
         messagebox.showerror(WINDOW_TITLE, "Bot must be on the server")

@@ -66,32 +66,32 @@ def checkAuth():
     return True
 
 def getUsers():
-    userid = ""
+    userId = ""
     startTime = time.time()
     users = 0
 
     with open(filename, "w", encoding="utf-8") as file:
         while True:
-            r = requests.get(f"https://discord.com/api/v10/guilds/{guildId}/members?limit=1000{userid}", headers=headers)
+            r = requests.get(f"https://discord.com/api/{verApi}/guilds/{guildId}/members?limit=1000{userId}", headers=headers)
             if r.status_code == 403:
                 genMsg.destroy()
                 file.close()
                 os.remove(filename)
 
                 webbrowser.open("https://discord.com/developers/applications")
-                messagebox.showwarning(WINDOW_TITLE, f"Set on Discord Developer Portal: Choose Bot → Bot → Privileged Gateway Intents → Server Members Intent (GUILD_MEMBERS)")
+                messagebox.showwarning(WINDOW_TITLE, f"Set on Discord Developer Portal: Choose Bot → Bot → Privileged Gateway Intents → Server Members Intent (GUILD_MEMBERS) and Try Again")
                 return
 
             members = r.json()
 
             for member in members:
                 if "roles" in member and isinstance(member["roles"], list):
-                    if str(roleId) in member["roles"]:
+                    if roleId in member["roles"]:
                         file.write(member["user"]["username"] + "\n")
                         users += 1
 
             if len(members):
-                userid = "&after=" + members[-1]["user"]["id"]
+                userId = "&after=" + members[-1]["user"]["id"]
                 time.sleep(.3)
             elif users == 0:
                 genMsg.destroy()

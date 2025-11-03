@@ -15,7 +15,7 @@ def getUsers():
         "Authorization": f"Bot {auth}"
     }
 
-    authkey = requests.get(f"https://discord.com/{verApi}/v10/users/@me", headers=headers)
+    authkey = requests.get(f"https://discord.com/api/{verApi}/users/@me", headers=headers)
     if authkey.status_code in (500, 502):
         messagebox.showwarning(UB_TITLE, "Problem with Discord API")
         return
@@ -28,9 +28,9 @@ def getUsers():
         messagebox.showwarning(UB_TITLE, "Enter GuildID")
         return
     
-    gid = requests.get(f"https://discord.com/{verApi}/v10/guilds/{guildId}/bans", headers=headers)
+    gid = requests.get(f"https://discord.com/api/{verApi}/guilds/{guildId}/bans", headers=headers)
     if gid.status_code == 403:
-        messagebox.showerror(UB_TITLE, "Missing Permissions.")
+        messagebox.showerror(UB_TITLE, "Missing Permissions")
         return
     elif gid.status_code != 200:
         messagebox.showerror(UB_TITLE, "Bot must be on the server")

@@ -2,7 +2,7 @@ from cx_Freeze import setup, Executable
 
 setup(
     name="getUsers",
-    version="1.7",
+    version="1.8",
     description="",
     options={"build_exe": {
         "include_files": ["favicon.ico"]

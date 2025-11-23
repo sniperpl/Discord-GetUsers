@@ -85,7 +85,16 @@ def checkAuth():
 def getUsers():
     msgid = ""
     startTime = time.time()
-    users = set()
+    if boxDuplicate.get() == 1:
+        users = set()
+    else:
+        users = []
+
+    def rmvDuplicates():
+        if boxDuplicate.get() == 1:
+            users.add(message["author"]["id"])
+        else:
+            users.append(message["author"]["id"])
 
     with open(filename, "w", encoding="utf-8") as file:
         while True:
@@ -95,15 +104,15 @@ def getUsers():
             for message in messages:                
                 if boxImage.get() == 1 and boxText.get() == 1:
                     if len(message["attachments"]) >= imgAmount and cMsg.lower().strip() in message["content"].lower():
-                        users.add(message["author"]["id"])
+                        rmvDuplicates()
                 elif boxImage.get() == 1:
                     if len(message["attachments"]) >= imgAmount:
-                        users.add(message["author"]["id"])
+                        rmvDuplicates()
                 elif boxText.get() == 1:
                     if cMsg.lower().strip() in message["content"].lower():
-                        users.add(message["author"]["id"])
+                        rmvDuplicates()
                 else:
-                    users.add(message["author"]["id"])
+                    rmvDuplicates()
 
                 if message["id"] == msgId:
                     if len(users) < 1:
@@ -121,7 +130,7 @@ def getUsers():
                             file.write(user["user"]["username"] + "\n")
                     
                     genMsg.destroy()
-                    messagebox.showinfo(WINDOW_TITLE, f"{filename} was generated in {time.time() - startTime:.0f}s")
+                    messagebox.showinfo(WINDOW_TITLE, f"{filename} was generated with {len(users)} users in {time.time() - startTime:.0f}s")
                     return
 
                 msgid = "&before=" + message["id"]
@@ -142,7 +151,7 @@ def genStart():
 
 # Tworzenie głównego okna aplikacji
 def guiUsersMsgIDByBot(root):
-    global Authorization, enterGuildId, enterChannelId, enterMsgId, enterFilename, entryImgAmount, enterImgAmount, entryMessage, enterMessage, boxImage, boxText, labels
+    global Authorization, enterGuildId, enterChannelId, enterMsgId, enterFilename, entryImgAmount, enterImgAmount, entryMessage, enterMessage, boxDuplicate, boxImage, boxText, labels
 
     labels = []
     containerFrame = tk.Frame(root)
@@ -174,8 +183,11 @@ def guiUsersMsgIDByBot(root):
     enterFilename = tk.Entry(containerFrame)
     enterFilename.pack(ipady=1)
 
+    boxDuplicate = tk.IntVar(value=1)
+    tk.Checkbutton(containerFrame, text="Remove Duplicates", variable=boxDuplicate, font=(defFont, 10)).pack(pady=(10,0))
+
     boxImage = tk.IntVar()
-    tk.Checkbutton(containerFrame, text="Check Images", variable=boxImage, command=vImage, font=(defFont, 10)).pack(pady=(10,0))
+    tk.Checkbutton(containerFrame, text="Check Images", variable=boxImage, command=vImage, font=(defFont, 10)).pack()
 
     entryImgAmount = tk.Frame(containerFrame)
     entryImgAmount.pack()

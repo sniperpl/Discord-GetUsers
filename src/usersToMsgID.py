@@ -67,7 +67,16 @@ def checkAuth():
 def getUsers():
     msgid = ""
     startTime = time.time()
-    users = set()
+    if boxDuplicate.get() == 1: 
+        users = set()
+    else:
+        users = 0
+
+    def rmvDuplicates():
+        if boxDuplicate.get() == 1:
+            users.add(message["author"]["username"])
+        else:
+            file.write(message['author']['username'] + '\n')
 
     with open(filename, "w", encoding="utf-8") as file:
         while True:
@@ -77,18 +86,18 @@ def getUsers():
             for message in messages:
                 if boxImage.get() == 1 and boxText.get() == 1:
                     if len(message["attachments"]) >= imgAmount and cMsg.lower().strip() in message["content"].lower():
-                        users.add(message["author"]["username"])
+                        rmvDuplicates()
                 elif boxImage.get() == 1:
                     if len(message["attachments"]) >= imgAmount:
-                        users.add(message["author"]["username"])
+                        rmvDuplicates()
                 elif boxText.get() == 1:
                     if cMsg.lower().strip() in message["content"].lower():
-                        users.add(message["author"]["username"])
+                        rmvDuplicates()
                 else:
-                    users.add(message["author"]["username"])
+                    rmvDuplicates()
 
                 if message["id"] == msgId:
-                    if len(users) < 1:
+                    if (boxDuplicate.get() == 1 and len(users) < 1) or (boxDuplicate.get() == 0 and users < 1):
                         genMsg.destroy()
                         file.close()
                         os.remove(filename)
@@ -96,11 +105,17 @@ def getUsers():
                         messagebox.showinfo(WINDOW_TITLE, f"No users found")
                         return
                     ######
-                    file.writelines(user + "\n" for user in users)
+                    if boxDuplicate.get() == 1:
+                        file.writelines(user + "\n" for user in users)
+
                     genMsg.destroy()
 
-                    messagebox.showinfo(WINDOW_TITLE, f"{filename} was generated with {len(users)} users in {time.time() - startTime:.0f}s")
+                    usrLength = len(users) if boxDuplicate.get() == 1 else users
+                    messagebox.showinfo(WINDOW_TITLE, f"{filename} was generated with {usrLength} users in {time.time() - startTime:.0f}s")
                     return
+                
+                if boxDuplicate.get() == 0:
+                    users += 1
 
                 msgid = "&before=" + message["id"]
 
@@ -118,7 +133,7 @@ def genStart():
 
 # Tworzenie głównego okna aplikacji
 def guiUsersMsgID(root):
-    global Authorization, enterChannelId, enterMsgId, enterFilename, entryMessage, enterMessage, entryImgAmount, enterImgAmount, boxImage, boxText, labels
+    global Authorization, enterChannelId, enterMsgId, enterFilename, entryMessage, enterMessage, entryImgAmount, enterImgAmount, boxDuplicate, boxImage, boxText, labels
 
     labels = []
     containerFrame = tk.Frame(root)
@@ -146,8 +161,11 @@ def guiUsersMsgID(root):
     enterFilename = tk.Entry(containerFrame)
     enterFilename.pack(ipady=1)
 
+    boxDuplicate = tk.IntVar(value=1)
+    tk.Checkbutton(containerFrame, text="Remove Duplicates", variable=boxDuplicate, font=(defFont, 10)).pack(pady=(10,0))
+
     boxImage = tk.IntVar()
-    tk.Checkbutton(containerFrame, text="Check Images", variable=boxImage, command=vImage, font=(defFont, 10)).pack(pady=(10,0))
+    tk.Checkbutton(containerFrame, text="Check Images", variable=boxImage, command=vImage, font=(defFont, 10)).pack()
 
     entryImgAmount = tk.Frame(containerFrame)
     entryImgAmount.pack()

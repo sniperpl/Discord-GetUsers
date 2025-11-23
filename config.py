@@ -15,7 +15,7 @@ def center_window(window, width, height):
     window.geometry(f"{width}x{height}+{x}+{y}")
 
 root = Tk()
-center_window(root, 400, 500)
+center_window(root, 400, 525)
 
 root.iconbitmap("favicon.ico")
 root.option_add("*Label.Font", (defFont, 13))

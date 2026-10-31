@@ -9,9 +9,10 @@
 - Get Users
   - by User `Better solution than by bot, but no check is the user on the server`
   - by Bot `Checks if the user is on the server, but checks longer than user`
-  - to Message ID `Better solution than by bot, but no check is the user on the server`
-  - to Message ID by Bot `Checks if the user is on the server, but checks longer than user`
+  - to MsgID `Better solution than by bot, but no check is the user on the server`
+  - to MsgID by Bot `Checks if the user is on the server, but checks longer than user`
   - with Role ID
+  - Msg Reactions
 - Unban All
 
 ## 🠋 IF YOU WANNA CONTRIBUTE 🠋

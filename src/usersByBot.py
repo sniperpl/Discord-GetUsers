@@ -70,6 +70,13 @@ def checkAuth():
         with open("botKey.txt", "w") as file:
             file.write(auth)
 
+    if os.path.exists("botKey.txt"):
+        with open("botKey.txt", "r") as file:
+            botKey = file.read()
+            if botKey != auth:
+                with open("botKey.txt", "w") as file:
+                    file.write(auth)
+
     return True
 
 def getUsers():

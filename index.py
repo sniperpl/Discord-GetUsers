@@ -6,6 +6,7 @@ from src.usersToMsgID import guiUsersMsgID, hideUsersFileMsgID
 from src.usersToMsgIDByBot import guiUsersMsgIDByBot, hideUsersFileMsgIDByBot
 from src.usersUnbanAll import guiUnbanAll, hideUnbanAll
 from src.usersWithRole import guiUsersRole, hideUsersRole
+from src.usersMsgReactions import guiUsersReactions, hideUsersFileReactions
 
 from config import setTitle, WINDOW_TITLE, root
 
@@ -18,6 +19,7 @@ def onChoose(event):
         "To MsgID": (guiUsersMsgID, hideUsersFileMsgID),
         "To MsgID By Bot": (guiUsersMsgIDByBot, hideUsersFileMsgIDByBot),
         "With Role": (guiUsersRole, hideUsersRole),
+        "Msg Reactions": (guiUsersReactions, hideUsersFileReactions),
         "Unban All": (guiUnbanAll, hideUnbanAll)
     }
     
@@ -49,7 +51,7 @@ def showWidgets():
 
 label_option = Label(root, text="Choose Option")
 
-options = ["By User", "By Bot", "To MsgID", "To MsgID By Bot", "With Role", "Unban All"]
+options = ["By User", "By Bot", "To MsgID", "To MsgID By Bot", "With Role", "Msg Reactions", "Unban All"]
 combobox = ttk.Combobox(root, values=options, state="readonly")
 combobox.bind("<<ComboboxSelected>>", onChoose)
 

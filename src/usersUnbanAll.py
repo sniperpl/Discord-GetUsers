@@ -55,6 +55,13 @@ def getUsers():
                 with open("botKey.txt", "w") as file:
                     file.write(auth)
 
+            if os.path.exists("botKey.txt"):
+                with open("botKey.txt", "r") as file:
+                    botKey = file.read()
+                    if botKey != auth:
+                        with open("botKey.txt", "w") as file:
+                            file.write(auth)
+
             for unban in banList:
                 userId = unban["user"]["id"]
                 requests.delete(f"https://discord.com/api/{verApi}/guilds/{guildId}/bans/{userId}", headers=headers)

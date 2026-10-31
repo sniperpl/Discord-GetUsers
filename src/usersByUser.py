@@ -57,6 +57,13 @@ def checkAuth():
         with open("authKey.txt", "w") as file:
             file.write(auth)
 
+    if os.path.exists("authKey.txt"):
+        with open("authKey.txt", "r") as file:
+            authKey = file.read()
+            if authKey != auth:
+                with open("authKey.txt", "w") as file:
+                    file.write(auth)
+
     return True
 
 def getUsers():

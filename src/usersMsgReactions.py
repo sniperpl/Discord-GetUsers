@@ -83,10 +83,11 @@ def getUsers():
 
             if not listOfUsers:
                 genMsg.destroy()
-                messagebox.showinfo(WINDOW_TITLE, f"{filename} was generated with {len(users)} users in {time.time() - startTime:.0f}s")
+                messagebox.showinfo(WINDOW_TITLE, f"{filename} was generated with {users} users in {time.time() - startTime:.0f}s")
                 return
 
             for user in listOfUsers:
+                users += 1
                 file.write(user['username'] + '\n')
                     
                 after = "&after=" + user["id"]

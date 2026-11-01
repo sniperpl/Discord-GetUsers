@@ -3,7 +3,7 @@ from cx_Freeze import setup, Executable
 setup(
     name="getUsers",
     version="1.9",
-    description="Get or unban users from Discord servers",
+    description="Get or unban users from Discord Servers",
     options={"build_exe": {
         "include_files": ["favicon.ico"]
     }},
